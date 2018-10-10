@@ -16,9 +16,10 @@ var port = process.env.PORT;
 app.use(bodyParser.json());
 
 /** add todo */
-app.post('/todos', (req, res) => {
+app.post('/todos', authenticare, (req, res) => {
     var todo = new Todo({
-        text: req.body.text
+        text: req.body.text,
+        _creator: req.user._id
     });
 
     todo.save().then((doc) => {
@@ -29,8 +30,10 @@ app.post('/todos', (req, res) => {
 });
 
 /** get todos */
-app.get('/todos', (req, res) => {
-    Todo.find().then((todos) => {
+app.get('/todos', authenticare, (req, res) => {
+    Todo.find({
+        _creator: req.user._id
+    }).then((todos) => {
         res.send({ todos });
     }, (e) => {
         res.status(400).send(e);
